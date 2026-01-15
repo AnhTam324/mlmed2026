@@ -1,6 +1,5 @@
-USTH Machine Learning in Medicine 2026
-==================================
+# USTH Machine Learning in Medicine 2026
 
-* Ngô Anh Tâm
-* 23BI14392
-* Group 10
+* Student name: Ngô Anh Tâm
+* Student ID: 23BI14392
+* Group ID: 10
