@@ -1,4 +1,5 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
+\usepackage{parskip}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{enumitem}
 \usepackage{subcaption}
@@ -24,7 +25,7 @@ This is a practical work for the first work in Machine Learning in Medicine. The
 In this section, the topic is the ECG Heartbeat Categorization Dataset, which is used to explore heartbeat classification using deep neural network architectures and observe some of the capabilities of transfer learning on it.
 
 In this dataset, two Excel files are split into training and testing sets with a ratio of 4:1; the number of samples is 109,446, and there are 188 columns. Each row represents a sequence of ECG heartbeats over time. All data are numerical values, with the final column serving as the target to be classified. 5 classes required model to select which contain 
-
+             
 \begin{itemize}
     \item \textbf{0.0}: Normal
     \item \textbf{1.0}: Supraventricular Ectopic
@@ -84,7 +85,10 @@ As the charts illustrate, the count of normal classes dominates the dataset, app
 \begin{enumerate}
     \item \textbf{Data processing}
 
+
 Since all data values in the dataset are numerical values in the range [0, 1], which indicates that the normalized value, the train dataset is prepared to train the classification model.
+
+
     \item \textbf{Training}
 
 For the machine learning algorithm used for the model, the Random Forest Classifier is applied because the dataset contains 109446 samples, which are large number, so the decision tree using the random part of the data, so that every tree is a bit different. Therefore, it helps reduce overfitting and makes the overall prediction more accurate and trustworthy.
