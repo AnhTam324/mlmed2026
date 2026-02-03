@@ -1,0 +1,144 @@
+\documentclass[twocolumn]{article}
+\usepackage{parskip}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+]{hyperref}
+\usepackage{csvsimple}
+
+\title{Machine Learning in Medicine \\ Practical Work 2}
+\author{Ngô Anh Tâm - 23BI14392}
+\date{January 2026}
+\usepackage{indentfirst}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+In this practical study, a model will be calculated to estimate fetal head circumference from images recorded during ultrasound scans. After this process, the model will compute the head circumference from the segmentation image. 
+
+A folder and an Excel file make up the training dataset. An annotated ellipse that encloses the baby head is present in 999 of the ultrasound-scanned photographs in the folder. the Excel file compare each pixel size of each image with the truth fetal head circumference in the scanned photos
+
+This is an example of an ultrasound image with the corresponding annotation: 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.0\linewidth]{1.png}
+    \caption{Ultrasound Images}
+    \label{fig:ultrasound_annotation}
+\end{figure}
+
+
+The left image shows the original scan, while the right image displays the annotated fetal head contour used for head circumference estimation.
+
+Besides, there are the pixel size and the exact head circumference in first five images
+
+
+\begin{table}
+\centering
+\caption{Sample entries from the training dataset}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c}
+\hline
+Filename & Pixel size (mm) & Head circumference (cm) \\
+\hline
+000\_HC.png & 0.069136 & 44.30 \\
+001\_HC.png & 0.089659 & 56.81 \\
+002\_HC.png & 0.062033 & 68.75 \\
+003\_HC.png & 0.091291 & 69.00 \\
+004\_HC.png & 0.061240 & 59.81 \\
+\hline
+\end{tabular}
+\label{tab:dataset_sample}
+\end{table}
+
+
+The pixel size provides the spatial resolution of the ultrasound image and enables the conversion of measurements from pixel units to real-world units. As a result, it is crucial to calculate the fetal head circumference in millimeters precisely with the formula: 
+\[
+HC_{\mathrm{mm}} = HC_{\mathrm{pixel}} \times s_{\mathrm{pixel}}
+\]
+where:
+\begin{itemize}
+    \item \(HC_{\mathrm{pixel}}\) is the head circumference measured in pixels, obtained by fitting an ellipse that encloses the segmented fetal head region in the ultrasound image,
+    \item \(s_{\mathrm{pixel}}\) denotes the pixel size in millimeters.
+\end{itemize}
+\section{Training}
+\begin{enumerate}
+    \item \textbf{Data preprocessing}
+    
+Firstly, each ultrasound image is converted into grayscale and resized to a fixed resolution of 512 × 512 pixels to ensure consistent input dimensions. The pixel intensities are then normalized to the range [0, 1].
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{2.png}
+    \caption{Ultrasound Images with Filled Masks}
+    \label{fig:filled_mask}
+\end{figure}
+
+Then, the annotated ultrasound images are used to create filled binary masks before training the model. The annotations are converted into pixel-wise masks that delineate the fetal head region. Finally, the segmentation model is trained using both the preprocessed images and the matching masks as input-output pairs.
+
+    \item \textbf{Training Model}
+    
+Following the preprocessing step, the fetal head region is automatically extracted from ultrasound pictures using a deep learning-based segmentation algorithm.
+
+About the deep learning model used in practical work, U-Net is applied for fetal head segmentation. U-Net is a kind of neural network mainly used for image segmentation which means dividing an image into different parts to identify specific objects for example separating a tumor from healthy tissue in a medical scan, which suitable for ultrasound images.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{U-Net.png}
+    \caption{U-Net Architechture}
+    \label{fig:unet_architechture}
+\end{figure}
+
+Dice loss was used to train the model in order to maximize segmentation performance. Convolutional layers with ReLU activation were used after upsampling and skip connections were used to implement the decoder. Binary segmentation masks were produced in the output layer by applying a sigmoid function.
+
+The Dice loss formula is as follows:
+
+\[
+\mathcal{L}_{\text{Dice}} = 1 - \frac{2 \sum_{i} y_i \hat{y}_i + \epsilon}{\sum_{i} y_i + \sum_{i} \hat{y}_i + \epsilon}
+\]
+
+where:
+\begin{itemize}
+    \item \(y_i\) ground truth \(i\),
+    \item \(\hat{y}_i\) predicted segmentation \(i\),
+    \item \(\epsilon\) small smoothing constant.
+\end{itemize}
+
+Before training, the dataset is split into training and validation sets with an 8:2 ratio. The model is then trained for 40 epochs.
+
+
+
+    \item \textbf{Result}
+
+According to the training result, the accuracy of the model reaches nearly 0.966 and the dice loss score is 0.0813. However, the validation accuracy is 0.8617 with the validation of dice loss is 0.3973. Besides, the MAE evaluation score is 50.49. This concludes that the model can cause some mistakes while segmenting the region of the fetal head circumference
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{3.png}
+    \caption{Training and Validation Loss}
+    \label{fig:Loss}
+\end{figure}
+
+Following the predicted result, which can be seen as following images:
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{pre1.png}
+    \includegraphics[width=0.8\linewidth]{pre2.png}
+    \includegraphics[width=0.8\linewidth]{pre3.png}
+    \caption{Predicted segmentation}
+    \label{fig:hc_results}
+\end{figure}
+
+It is clear that the model could recognize the fetal head in the ultrasound pictures. There was a small discrepancy between the fetal head circumference and the actual size, because the model continued to misclassify several surrounding areas.
+    
+\end{enumerate}
+
+\end{document}
